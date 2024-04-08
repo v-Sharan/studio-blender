@@ -82,7 +82,7 @@ class FormationsPanel(Panel):
             text="Append",
             icon="FORWARD",
         )
-
+   
         row = layout.row(align=True)
         row.operator(
             UpdateFormationOperator.bl_idname, text="Update", icon="FILE_REFRESH"

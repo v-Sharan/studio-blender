@@ -1,8 +1,8 @@
 bl_info = {
-    "name": "Skybrush Studio",
+    "name": "Mspace Studio",
     "author": "CollMot Robotics Ltd.",
     "description": "Extends Blender with UI components for drone show design",
-    "version": (3, 3, 3),
+    "version": (1, 0, 0),
     "blender": (3, 3, 0),
     "category": "Interface",
     "doc_url": "https://doc.collmot.com/public/skybrush-studio-for-blender/latest/",
