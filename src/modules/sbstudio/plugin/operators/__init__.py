@@ -50,6 +50,7 @@ from .update_time_markers_from_storyboard import UpdateTimeMarkersFromStoryboard
 from .update_frame_range_from_storyboard import UpdateFrameRangeFromStoryboardOperator
 from .use_vgroup_for_formation import UseSelectedVertexGroupForFormationOperator
 from .validate_trajectories import ValidateTrajectoriesOperator
+from .append_all_formation_to_storyboard import AppendAllFormationToStoryboardOperator
 
 __all__ = (
     "AppendFormationToStoryboardOperator",
@@ -100,4 +101,5 @@ __all__ = (
     "UseSelectedVertexGroupForFormationOperator",
     "TakeoffOperator",
     "ValidateTrajectoriesOperator",
+    "AppendAllFormationToStoryboardOperator"
 )

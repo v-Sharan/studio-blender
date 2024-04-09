@@ -1,5 +1,5 @@
 from math import ceil
-import bpy
+
 from .base import FormationOperator
 
 from sbstudio.plugin.api import get_api
@@ -50,69 +50,61 @@ class AppendFormationToStoryboardOperator(FormationOperator):
         last_formation = storyboard.last_formation
         last_frame = storyboard.frame_end
 
-        storyboard = getattr(context.scene.skybrush, "storyboard", None)
-        formations = context.scene.skybrush.formations
+        entry = storyboard.add_new_entry(
+            name=formation.name, select=True, formation=formation
+        )
+        assert entry is not None
 
-        num_collection = len(bpy.data.collections["Formations"].children) 
-        child = bpy.data.collections["Formations"].children
-        safety_check = getattr(context.scene.skybrush, "safety_check", None)
-        settings = getattr(context.scene.skybrush, "settings", None)
+        fps = context.scene.render.fps
 
-        last_formation = storyboard.last_formation
-        last_frame = storyboard.frame_end
+        # Set up safety check parameters
+        safety_kwds = {
+            "max_velocity_xy": (
+                safety_check.velocity_xy_warning_threshold if safety_check else 8
+            ),
+            "max_velocity_z": (
+                safety_check.velocity_z_warning_threshold if safety_check else 2
+            ),
+            "max_velocity_z_up": (
+                safety_check.velocity_z_warning_threshold_up_or_none
+                if safety_check
+                else None
+            ),
+            "max_acceleration": settings.max_acceleration if settings else 4,
+        }
 
-        
-        for i in range(num_collection):
-            if i == 0 or i ==1:
-                continue
-            entry = storyboard.add_new_entry(name=child[i].name, select=True, formation=child[i])
-            assert entry is not None
-            fps = bpy.context.scene.render.fps
-            
-            safety_kwds = {
-                "max_velocity_xy": (
-                    safety_check.velocity_xy_warning_threshold if safety_check else 8
-                ),
-                "max_velocity_z": (
-                    safety_check.velocity_z_warning_threshold if safety_check else 2
-                ),
-                "max_velocity_z_up": (
-                    safety_check.velocity_z_warning_threshold_up_or_none
-                    if safety_check
-                    else None
-                ),
-                "max_acceleration": settings.max_acceleration if settings else 4,
-            }
-            with create_position_evaluator() as get_positions_of:
-                if last_formation is not None:
-                    source = get_world_coordinates_of_markers_from_formation(
-                        last_formation, frame=last_frame
-                    )
-                    source = [tuple(coord) for coord in source]
-                else:
-                    drones = Collections.find_drones().objects
-                    source = get_positions_of(drones, frame=last_frame)
-
-                target = get_world_coordinates_of_markers_from_formation(
-                    formation=child[i], frame=entry.frame_start
+        with create_position_evaluator() as get_positions_of:
+            if last_formation is not None:
+                source = get_world_coordinates_of_markers_from_formation(
+                    last_formation, frame=last_frame
                 )
-                target = [tuple(coord) for coord in target]
-            try:
-                plan = get_api().plan_transition(source, target, **safety_kwds)
-            except Exception:
-                raise self.report({"ERROR"},"Error while invoking transition planner on the Skybrush Studio server",)
-                # return {"CANCELLED"}
+                source = [tuple(coord) for coord in source]
+            else:
+                drones = Collections.find_drones().objects
+                source = get_positions_of(drones, frame=last_frame)
 
-            # To get nicer-looking frame counts, we round the end of the
-            # transition up to the next whole second. We need to take into account
-            # whether the scene starts from frame 1 or 0 or anything else
-            # stored in storyboard.frame_start, though.
-            new_start = ceil(
-                last_frame + (plan.total_duration if plan.durations else 10) * fps
+            target = get_world_coordinates_of_markers_from_formation(
+                formation, frame=entry.frame_start
             )
-            diff = ceil((new_start - storyboard.frame_start) / fps) * fps
-            entry.frame_start = storyboard.frame_start + diff
-            
-            print(new_start,diff,plan.total_duration,plan.durations)
+            target = [tuple(coord) for coord in target]
+        try:
+            plan = get_api().plan_transition(source, target, **safety_kwds)
+        except Exception:
+            raise
+            self.report(
+                {"ERROR"},
+                "Error while invoking transition planner on the Skybrush Studio server",
+            )
+            return {"CANCELLED"}
+
+        # To get nicer-looking frame counts, we round the end of the
+        # transition up to the next whole second. We need to take into account
+        # whether the scene starts from frame 1 or 0 or anything else
+        # stored in storyboard.frame_start, though.
+        new_start = ceil(
+            last_frame + (plan.total_duration if plan.durations else 10) * fps
+        )
+        diff = ceil((new_start - storyboard.frame_start) / fps) * fps
+        entry.frame_start = storyboard.frame_start + diff
 
         return {"FINISHED"}

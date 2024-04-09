@@ -113,6 +113,7 @@ from sbstudio.plugin.operators import (
     UpdateTimeMarkersFromStoryboardOperator,
     UseSelectedVertexGroupForFormationOperator,
     ValidateTrajectoriesOperator,
+    AppendAllFormationToStoryboardOperator
 )
 from sbstudio.plugin.panels import (
     DroneShowAddonObjectPropertiesPanel,
@@ -219,6 +220,7 @@ operators = (
     AddMarkersFromZippedCSVOperator,
     AddMarkersFromQRCodeOperator,
     RefreshFileFormatsOperator,
+    AppendAllFormationToStoryboardOperator
 )
 
 #: List widgets in this addon.

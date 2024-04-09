@@ -11,6 +11,7 @@ from sbstudio.plugin.operators import (
     SelectFormationOperator,
     UpdateFormationOperator,
     AppendFormationToStoryboardOperator,
+    AppendAllFormationToStoryboardOperator
 )
 from sbstudio.plugin.stats import get_drone_count
 
@@ -80,6 +81,12 @@ class FormationsPanel(Panel):
         row.operator(
             AppendFormationToStoryboardOperator.bl_idname,
             text="Append",
+            icon="FORWARD",
+        )
+        
+        row.operator(
+            AppendAllFormationToStoryboardOperator.bl_idname,
+            text="Append All",
             icon="FORWARD",
         )
    

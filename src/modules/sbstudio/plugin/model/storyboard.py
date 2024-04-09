@@ -434,7 +434,7 @@ class Storyboard(PropertyGroup, ListMixin):
 
         entry = self.entries.add()
         entry.frame_start = frame_start
-        entry.duration = duration
+        entry.duration = 0
         entry.name = name
 
         if (

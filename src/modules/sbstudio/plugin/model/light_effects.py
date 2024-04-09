@@ -881,7 +881,7 @@ class LightEffectCollection(PropertyGroup, ListMixin):
         entry: LightEffect = cast(LightEffect, self.entries.add())
         entry.type = "COLOR_RAMP"
         entry.frame_start = frame_start
-        entry.duration = duration
+        entry.duration = 0
         entry.name = name
 
         texture = entry._create_texture()
